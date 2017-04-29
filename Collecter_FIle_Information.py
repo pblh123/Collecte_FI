@@ -73,8 +73,7 @@ def ToExcel(Path):
                             row+=1
                         except:
                             print('Here is wrong!')
-
-
+    workbook.close()
 
 if __name__ == '__main__':
     print('Please input path:')
