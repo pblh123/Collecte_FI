@@ -1,10 +1,12 @@
 # _*_ coding: utf-8 _*_
 __author__ = 'pblh123'
-#Find special file in windows Python3
+#Find special file with python3
 
 import os,sys
 import time
-
+import csv
+import xlsxwriter
+import openpyxl
 
 #Get create time
 def Ctime(File):
@@ -25,9 +27,10 @@ def Atime(File):
     atime=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(os.path.getatime(File)))
     return atime
 
+
 # create excel file
 def ToExcel(Path):
-    File=Path+'\\'+"Collecter_files.xlsx"
+    OutputEcevelFile=Path+'\\'+"Collecter_files.xlsx"
     FileTypes=[]
     for root,dirs,files in os.walk(Path):
         for file in files:
@@ -37,21 +40,22 @@ def ToExcel(Path):
                 FileTypes.append(os.path.splitext(file)[1][1:])
     print(FileTypes)
     # create excel file
-    workbook=xlsxwriter.Workbook(File)
+    workbook=xlsxwriter.Workbook(OutputEcevelFile)
+    bold=workbook.add_format({'bold':1})
     for i in FileTypes:
         if i != '':
             try:
                 worksheet=workbook.add_worksheet(i)
                 row=0
-                worksheet.write(row,0,"文件名")
-                worksheet.write(row,1,"文件大小")
-                worksheet.write(row,2,"文件路径")
-                worksheet.write(row,3,"文件创建时间")
-                worksheet.write(row,4,"文件修改时间")
-                worksheet.write(row,5,"最后访问时间")
+                worksheet.write(row,0,"FileName",bold)
+                worksheet.write(row,1,"FileSize",bold)
+                worksheet.write(row,2,"FilePath",bold)
+                worksheet.write(row,3,"Createtime",bold)
+                worksheet.write(row,4,"ModifiedTime",bold)
+                worksheet.write(row,5,"AccessTime",bold)
                 row+=1
             except:
-                print(i+'is unsupport forma!')
+                print(i+'is unsupport format!')
                 continue
             for root,dirs,files in os.walk(Path):
                 for file in files:
@@ -74,9 +78,28 @@ def ToExcel(Path):
                         except:
                             print('Here is wrong!')
     workbook.close()
+    ExcelFile=openpyxl.load_workbook(OutputEcevelFile)
+    ContentTable=ExcelFile.create_sheet('content',0)
+    row0=1
+    No0=1
+    ContentTable['A1']='No'
+    ContentTable['B1']='File_Type'
+    ContentTable['C1']='File_Num'
+    for j in FileTypes:
+        if j != '':
+            try:
+                row0+=1
+                ExcelTables=ExcelFile.get_sheet_by_name(j)
+                TableRowsLen=ExcelTables.max_row
+                ContentTable.cell(row=row0,column=1).value = No0
+                ContentTable.cell(row=row0,column=2).value = j
+                ContentTable.cell(row=row0,column=3).value = TableRowsLen
+                No0+=1
+            except:
+                print('Here is wrong!')
+    ExcelFile.save(OutputEcevelFile)
 
 if __name__ == '__main__':
     print('Please input path:')
     Path=input()
     ToExcel(Path)
-
