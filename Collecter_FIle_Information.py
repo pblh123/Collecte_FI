@@ -27,28 +27,6 @@ def Atime(File):
     atime=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(os.path.getatime(File)))
     return atime
 
-#Find special File of in special content
-def Find_Files_List(Path,File_Type):
-    NTS=time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))
-    with open(Path+File_Type+'_'+NTS+'.txt','w') as F:
-        Title="文件名"+'\t'+"文件大小"+'\t'+"文件路径"+'\t'+"文件创建时间"+'\t'+"文件修改时间"+'\t'+"最后访问时间"+'\n'
-        F.write(Title)
-        for root,dirs,files in os.walk(Path):
-            for file in files:
-                Type='.'+File_Type
-                if os.path.splitext(file)[1]==Type:
-                    try:
-                        File=os.path.join(root,file)
-                        ctime=Ctime(File) 
-                        mtime=Mtime(File)
-                        atime=Atime(File)
-                        fsize=GetSize(File)
-                        Str= file+'\t'+str(fsize)+'\t'+root+'\t'+ctime+'\t'+mtime+'\t'+atime+'\n'
-                        print(Str)
-                        F.write(Str)
-                    except:
-                        print('Here is wrong!')
-
 # create excel file
 def ToExcel(Path):
     OutputEcevelFile=Path+'\\'+"Collecter_files.xlsx"
@@ -56,6 +34,7 @@ def ToExcel(Path):
     for root,dirs,files in os.walk(Path):
         for file in files:
             if os.path.splitext(file)[1][1:] in FileTypes:
+
                 continue
             else:
                 FileTypes.append(os.path.splitext(file)[1][1:])
@@ -110,11 +89,12 @@ def ToExcel(Path):
         if j != '':
             try:
                 row0+=1
+                links='#'+j+'!A1'
                 ExcelTables=ExcelFile.get_sheet_by_name(j)
                 TableRowsLen=ExcelTables.max_row
                 ContentTable.cell(row=row0,column=1).value = No0
-                ContentTable.cell(row=row0,column=2).value = j
-                ContentTable.cell(row=row0,column=3).value = TableRowsLen
+                ContentTable.cell(row=row0,column=2).value = '=HYPERLINK("{}","{}")'.format(links,j)
+                ContentTable.cell(row=row0,column=3).value = TableRowsLen -1
                 No0+=1
             except:
                 print('Here is wrong!')
