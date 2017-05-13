@@ -89,11 +89,12 @@ def ToExcel(Path):
         if j != '':
             try:
                 row0+=1
+                links='#'+j+'!A1'
                 ExcelTables=ExcelFile.get_sheet_by_name(j)
                 TableRowsLen=ExcelTables.max_row
                 ContentTable.cell(row=row0,column=1).value = No0
-                ContentTable.cell(row=row0,column=2).value = j
-                ContentTable.cell(row=row0,column=3).value = TableRowsLen
+                ContentTable.cell(row=row0,column=2).value = '=HYPERLINK("{}","{}")'.format(links,j)
+                ContentTable.cell(row=row0,column=3).value = TableRowsLen - 1
                 No0+=1
             except:
                 print('Here is wrong!')
